@@ -27,3 +27,9 @@ jobs:
 
     - name: Run Unit Tests (if configured)
       run: dotnet test --no-build --verbosity normal
+
+      - name: Restore NuGet Packages
+      run: dotnet restore RaceDay_MVC.sln
+
+    - name: Build Solution (API & MVC)
+      run: dotnet build RaceDay_MVC.sln --configuration Release --no-restore
