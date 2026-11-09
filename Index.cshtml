@@ -1,0 +1,36 @@
+﻿@model RaceDay_MVC.Models.ProfileDto
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card rd-card">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="rd-heading h2 mb-0">My Profile</h1>
+                    <span class="badge bg-primary fs-6">@Model.Role</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-semibold">Full Name</label>
+                    <div class="form-control-plaintext fs-5">@Model.FullName</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-semibold">Email Address</label>
+                    <div class="form-control-plaintext fs-5">@Model.Email</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-semibold">Phone Number</label>
+                    <div class="form-control-plaintext fs-5">@(string.IsNullOrEmpty(Model.Phone) ? "Not provided" : Model.Phone)</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

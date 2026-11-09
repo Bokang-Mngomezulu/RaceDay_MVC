@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "RaceDay_MVC.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "..\\RaceDay_api\\RaceDay_api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]

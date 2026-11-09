@@ -1,0 +1,48 @@
+﻿@model List<RaceDay_MVC.Models.PublicEventDto>
+
+@{
+    ViewData["Title"] = "Browse Events";
+}
+
+<div class="container mt-4">
+    <h2>All Available Events</h2>
+    <hr />
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            There are currently no events available. Check back later!
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var ev in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-secondary mb-2">@ev.EventType</span>
+                            <h5 class="card-title">@ev.Title</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@RaceDay_MVC.Helpers.UiHelpers.FormatDate(ev.Date)</h6>
+                            <p class="card-text">
+                                <strong>Location:</strong> @ev.Location <br />
+                                <strong>Distance:</strong> @ev.Distance
+                            </p>
+                            @if (!string.IsNullOrEmpty(ev.Description))
+                            {
+                                <p class="card-text text-truncate">@ev.Description</p>
+                            }
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <!-- Link to view event details and select a category to enter -->
+                            <a asp-controller="Home" asp-action="EventDetails" asp-route-id="@ev.EventId" class="btn btn-outline-primary w-100">
+                                View & Enter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

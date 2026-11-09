@@ -1,0 +1,131 @@
+﻿@model EventFormViewModel
+@{
+    var isEdit = Model.EventId.HasValue;
+    ViewData["Title"] = isEdit ? "Edit event" : "Create event";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card rd-card">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h1 class="rd-heading h2 mb-1">@(isEdit ? "Edit event" : "Create event")</h1>
+                        <p class="text-muted mb-0">Fields marked with * are required.</p>
+                    </div>
+                    @if (!isEdit)
+                    {
+                        <button type="button" class="btn btn-outline-info btn-sm" onclick="loadExampleTemplate()">Load Example Template</button>
+                    }
+                </div>
+
+                <form asp-action="@(isEdit ? "EditEvent" : "CreateEvent")" asp-route-id="@Model.EventId"
+                      method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                    <input type="hidden" asp-for="ExistingBannerUrl" />
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label> *
+                        <input asp-for="Name" class="form-control" placeholder="e.g. Summer City Marathon 2026" />
+                        <small class="form-text text-muted">Give your event a clear, catchy name including the year or edition.</small>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="e.g. Join thousands of runners for the annual city run. Finisher medal and refreshments included!"></textarea>
+                        <small class="form-text text-muted">Describe the route, schedule highlights, and what's included.</small>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="EventDate" class="form-label"></label> *
+                            <input asp-for="EventDate" type="datetime-local" class="form-control" />
+                            <small class="form-text text-muted">Select the official start date and time.</small>
+                            <span asp-validation-for="EventDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Location" class="form-label"></label> *
+                            <input asp-for="Location" class="form-control" placeholder="e.g. Greenpoint Stadium, Cape Town" />
+                            <small class="form-text text-muted">Specify the starting venue or address.</small>
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Distance" class="form-label"></label> *
+                            <input asp-for="Distance" class="form-control" placeholder="e.g. 42.2km" />
+                            <small class="form-text text-muted">Enter distance (e.g. 10km or 42.2km).</small>
+                            <span asp-validation-for="Distance" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="SportType" class="form-label"></label> *
+                            <select asp-for="SportType" class="form-select">
+                                <option value="Run">Run</option>
+                                <option value="Walk">Walk</option>
+                                <option value="Cycle">Cycle</option>
+                            </select>
+                            <span asp-validation-for="SportType" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Information" class="form-label"></label>
+                        <textarea asp-for="Information" class="form-control" rows="2" placeholder="e.g. Parking available at Gate 2. Bring your own water bottle."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="LiveWeather" class="form-label"></label>
+                        <input asp-for="LiveWeather" class="form-control" placeholder="e.g. Clear skies, 18°C" />
+                        <span asp-validation-for="LiveWeather" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Banner" class="form-label"></label>
+                        @if (!string.IsNullOrEmpty(Model.ExistingBannerUrl))
+                        {
+                            <div class="mb-2">
+                                <img src="@Model.ExistingBannerUrl" alt="Current banner" class="rd-banner" style="max-height:160px;" />
+                            </div>
+                            <div class="form-text mb-1">Choose a new image to replace this one, or leave empty to keep it.</div>
+                        }
+                        <input asp-for="Banner" type="file" class="form-control" accept="image/png,image/jpeg,image/webp,image/gif" />
+                        <div class="form-text">JPG, PNG, WEBP or GIF, up to 5 MB. (Remember to attach an image when creating a new event).</div>
+                        <span asp-validation-for="Banner" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-rd">@(isEdit ? "Save changes" : "Create event")</button>
+                        <a asp-action="Events" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function loadExampleTemplate() {
+            document.querySelector('#Name').value = "Summer City Marathon 2026";
+            document.querySelector('#Description').value = "Join thousands of runners for the annual Summer City Marathon 2026! Featuring a scenic route through the heart of the city.";
+
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(7, 0, 0, 0);
+            document.querySelector('#EventDate').value = tomorrow.toISOString().slice(0, 16);
+
+            document.querySelector('#Location').value = "Greenpoint Stadium, Cape Town";
+            document.querySelector('#Distance').value = "42.2km";
+            document.querySelector('#SportType').value = "Run";
+            document.querySelector('#Information').value = "Early bird registration includes an official race t-shirt. Water stations available every 3km.";
+            document.querySelector('#LiveWeather').value = "Clear skies, 18°C";
+        }
+    </script>
+}
+
+
+

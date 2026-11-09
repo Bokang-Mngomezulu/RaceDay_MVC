@@ -1,0 +1,43 @@
+﻿@model List<RaceDay_MVC.Models.MyResultDto>
+
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<div class="container mt-4">
+    <h2>My Race Results</h2>
+    <hr />
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No race results have been captured for you yet. Check back after your events conclude!
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Event Title</th>
+                        <th>Category</th>
+                        <th>Position</th>
+                        <th>Finish Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.EventTitle</td>
+                            <td>@item.CategoryName</td>
+                            <td>@(item.OverallPosition.HasValue? item.OverallPosition.Value.ToString() : "-")</td>
+                            <td>@RaceDay_MVC.Helpers.UiHelpers.FormatMinutes(item.Time)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

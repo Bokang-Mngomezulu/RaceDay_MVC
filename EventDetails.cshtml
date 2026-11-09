@@ -1,0 +1,94 @@
+﻿@model RaceDay_MVC.Models.EventDetailDto
+
+@{
+    ViewData["Title"] = Model.Name;
+    var isParticipant = Context.Session.IsParticipant();
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Participant" asp-action="Events">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-3">@Model.Name</h1>
+            <span class="badge bg-primary mb-3">@Model.EventType</span>
+
+            <p class="text-muted">
+                <strong>Date & Time:</strong> @RaceDay_MVC.Helpers.UiHelpers.FormatDate(Model.EventDate) <br />
+                <strong>Location:</strong> @Model.Location <br />
+                <strong>Distance:</strong> @Model.Distance
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <h4 class="mt-4">About this event</h4>
+                <p>@Model.Description</p>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Information))
+            {
+                <h4 class="mt-4">Additional Information</h4>
+                <p>@Model.Information</p>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Categories & Entry</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Categories == null || !Model.Categories.Any())
+                    {
+                        <p class="text-muted">No categories have been defined for this event yet.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">@cat.CategoryName</h6>
+                                        <small class="text-muted">
+                                            @if (!string.IsNullOrEmpty(cat.AgeGroup))
+                                            {
+                                                <span>Age: @cat.AgeGroup </span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(cat.Distance))
+                                            {
+                                                <span>(@cat.Distance)</span>
+                                            }
+                                        </small>
+                                        <div class="text-success fw-bold">@RaceDay_MVC.Helpers.UiHelpers.FormatMoney(cat.EntryFee)</div>
+                                    </div>
+
+                                    @if (isParticipant)
+                                    {
+                                        <form asp-action="Enrol" method="post">
+                                            <input type="hidden" name="eventId" value="@Model.EventId" />
+                                            <input type="hidden" name="eventCategoryId" value="@cat.EventCategoryId" />
+                                            <button type="submit" class="btn btn-sm btn-primary">Enter</button>
+                                        </form>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    @if (!isParticipant && !Context.Session.IsLoggedIn())
+                    {
+                        <div class="alert alert-warning small mb-0">
+                            Please <a asp-controller="Account" asp-action="Login">log in as a participant</a> to enter this event.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

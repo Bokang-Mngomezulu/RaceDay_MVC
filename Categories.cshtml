@@ -1,0 +1,105 @@
+﻿@model CategoriesViewModel
+@{
+    ViewData["Title"] = "Categories";
+    var ev = Model.Event;
+}
+
+<a asp-action="Events" class="text-decoration-none">&larr; Back to events</a>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 my-3">
+    <div>
+        <h1 class="rd-heading mb-0">@ev.Name</h1>
+        <p class="text-muted mb-0">@UiHelpers.FormatDate(ev.EventDate) &middot; @ev.Location</p>
+    </div>
+    <a asp-action="Enrolments" asp-route-id="@ev.EventId" class="btn btn-outline-rd">View enrolments</a>
+</div>
+
+@if (!string.IsNullOrEmpty(ev.BannerUrl))
+{
+    <img src="@ev.BannerUrl" alt="Banner for @ev.Name" class="rd-banner mb-4" />
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h2 class="rd-heading h4 mb-3">Categories for this event</h2>
+
+        @if (ev.Categories.Count == 0)
+        {
+            <div class="card rd-card">
+                <div class="card-body text-muted">
+                    No categories yet. Add an age group or distance category so participants can enter.
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table rd-table align-middle">
+                    <thead>
+                        <tr><th>Category</th><th>Age group</th><th>Distance</th><th>Entry fee</th><th>Max entrants</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in ev.Categories)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@c.CategoryName</td>
+                                <td>@(string.IsNullOrEmpty(c.AgeGroup) ? "-" : c.AgeGroup)</td>
+                                <td>@(string.IsNullOrEmpty(c.Distance) ? "-" : c.Distance)</td>
+                                <td>@UiHelpers.FormatMoney(c.EntryFee)</td>
+                                <td>@c.MaxCapacity</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card rd-card">
+            <div class="card-body p-4">
+                <h2 class="rd-heading h4">Add a category</h2>
+                <p class="text-muted small">For example "Under 20", "Senior", "10km" or "21km". Add an age group, a distance, or both.</p>
+
+                <form asp-action="AddCategory" asp-route-id="@ev.EventId" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Form.CategoryName" class="form-label"></label> *
+                        <input asp-for="Form.CategoryName" class="form-control" />
+                        <span asp-validation-for="Form.CategoryName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Form.AgeGroup" class="form-label"></label>
+                        <input asp-for="Form.AgeGroup" class="form-control" placeholder="e.g. Under 20" />
+                        <span asp-validation-for="Form.AgeGroup" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Form.Distance" class="form-label"></label>
+                        <input asp-for="Form.Distance" class="form-control" placeholder="e.g. 10km" />
+                        <span asp-validation-for="Form.Distance" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="Form.EntryFee" class="form-label"></label>
+                            <input asp-for="Form.EntryFee" type="number" step="0.01" min="0" class="form-control" />
+                            <span asp-validation-for="Form.EntryFee" class="text-danger"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="Form.MaxCapacity" class="form-label"></label>
+                            <input asp-for="Form.MaxCapacity" type="number" min="1" class="form-control" />
+                            <span asp-validation-for="Form.MaxCapacity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-text mb-3">Leave the fee and maximum empty to use R0.00 and 100.</div>
+
+                    <button type="submit" class="btn btn-rd w-100">Add category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

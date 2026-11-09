@@ -1,0 +1,25 @@
+﻿@{
+    var code = (int)(ViewBag.Code ?? 500);
+    ViewData["Title"] = "Something went wrong";
+
+    var heading = code switch
+    {
+        404 => "We can't find that page",
+        403 => "You can't go there",
+        _ => "Something went wrong"
+    };
+
+    var text = code switch
+    {
+        404 => "The page you were looking for doesn't exist or has moved.",
+        403 => "You don't have permission to view that page.",
+        _ => "An unexpected problem stopped that request. Please try again in a moment."
+    };
+}
+
+<div class="text-center py-5">
+    <p class="rd-heading display-3 text-rd-orange mb-0">@code</p>
+    <h1 class="rd-heading h2">@heading</h1>
+    <p class="text-muted mb-4">@text</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-rd">Back to home</a>
+</div>

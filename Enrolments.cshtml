@@ -1,0 +1,45 @@
+﻿@model List<RaceDay_MVC.Models.MyEnrolmentDto>
+
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<div class="container mt-4">
+    <h2>My Event Enrolments</h2>
+    <hr />
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            You are not currently enrolled in any events. Browse available events to join one!
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Event Title</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.EventTitle</td>
+                            <td>@item.CategoryName</td>
+                            <td>
+                                <span class="@RaceDay_MVC.Helpers.UiHelpers.StatusClass(item.Status)">
+                                    @item.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
