@@ -1,55 +1,62 @@
-using RaceDay_MVC.Helpers;
-using RaceDay_MVC.Services;
+using Microsoft.EntityFrameworkCore;
+using RaceDay_api.Models;
 using System.Globalization;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddHttpContextAccessor();
+// 1. Add Database Context
+builder.Services.AddDbContext<RacedayContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// MVC's own session: holds the user's role/name and the API's session cookie.
+// 2. Add Session Support (required for session-based authentication)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.Cookie.Name = ".RaceDay.Mvc.Session";   // different name from the API's cookie
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-if (string.IsNullOrWhiteSpace(apiBaseUrl))
-    throw new InvalidOperationException("ApiSettings:BaseUrl is not configured.");
+// 3. Add controllers
+builder.Services.AddControllers();
 
-builder.Services.AddTransient<ApiCookieHandler>();
-builder.Services.AddHttpClient<ApiClient>(client =>
+// 4. Configure Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
-    client.BaseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/");
-    client.Timeout = TimeSpan.FromSeconds(30);
-})
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false })
-.AddHttpMessageHandler<ApiCookieHandler>();
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "RaceDay API",
+        Version = "v1",
+        Description = "API endpoints for managing events, categories, enrolments, and results."
+    });
+
+    // Show the endpoint descriptions, request details and responses written as XML comments.
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+});
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RaceDay API V1");
+    });
 }
-app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
-app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

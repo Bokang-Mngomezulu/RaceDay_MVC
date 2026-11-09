@@ -1,2 +1,1 @@
-# RaceDay_MVC
-Raceday Model View Controller
+# RaceDay_api
