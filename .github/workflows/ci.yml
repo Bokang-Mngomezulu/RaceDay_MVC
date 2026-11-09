@@ -7,29 +7,23 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-
-    - name: Setup .NET 8 SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Restore NuGet Packages
-      run: dotnet restore
-
-    - name: Build Solution (API & MVC)
-      run: dotnet build --configuration Release --no-restore
-
-    - name: Run Unit Tests (if configured)
-      run: dotnet test --no-build --verbosity normal
-
+    build:
+      runs-on: ubuntu-latest
+  
+      steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+  
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+  
       - name: Restore NuGet Packages
-      run: dotnet restore RaceDay_MVC.sln
-
-    - name: Build Solution (API & MVC)
-      run: dotnet build RaceDay_MVC.sln --configuration Release --no-restore
+        run: dotnet restore RaceDay_MVC.sln
+  
+      - name: Build Solution (API & MVC)
+        run: dotnet build RaceDay_MVC.sln --configuration Release --no-restore
+  
+      - name: Run Unit Tests
+        run: dotnet test RaceDay_MVC.sln --no-build --verbosity normal
